@@ -26,3 +26,24 @@ https://pics5.baidu.com/feed/86d6277f9e2f070887621f3a51a8099fa901f23c.jpeg?token
 https://pics7.baidu.com/feed/77c6a7efce1b9d166f0747f990e605898d546421.jpeg?token=a08388127ccd1d38524ed1cbe3db7cad
 ### VGG16网络代码实例讲解
 https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=1882489676,154942204&fm=173&app=25&f=JPG?w=640&h=506&s=7B88782219FEE4CE0CD80CDA0300C0B3
+https://pics0.baidu.com/feed/d009b3de9c82d158282b39b83e86a8debd3e42a5.png?token=4fb67fb11e231ba74bbcd934acbe9a5c
+https://pics1.baidu.com/feed/4034970a304e251fbc5ef41c1f0a78117e3e533f.png?token=bafa62002fb45222c2941846d3fccfbf
+https://pics7.baidu.com/feed/54fbb2fb43166d22ead60bf4f1afb8f19152d244.png?token=40e10916975fc03417232600457a084b
+- 使用keras框架搭建的VGG16网络
+- 开始输入（60,160,1）的图像数据，即宽为60，高度为160的单通道灰度图像，使用灰度图是为了加快模型的训练
+- Conv2D(64, (3,3), name='conv1',padding='same', kernel_initializer='he_uniform')
+- Conv2D卷积层的padding为"same"，即给图像矩阵四周都加上0。卷积核使用"he_uniform"，大小为3x3，卷积核个数为64，一个卷积核扫完图像矩阵数据后，生成一个新的矩阵，有64个卷积核就会生成64 层新的矩阵。
+- BatchNormalization()(conv1)
+- 使用BN层，加快模型的训练和防止模型训练过拟合
+- Activation('relu')(bn1)
+- 卷积后使用relu激活函数
+- MaxPooling2D(pool_size=(2, 2), padding='same', name='pool3')(act7)
+- 使用最大池化，池化的小矩阵是2x2，默认了也是2x2的步长。经过池化后，矩阵的长宽都降低一半，由64*160*60的数据变成64*80*30
+- 其他同理，只是卷积核大小和卷积层个数做了修改。
+- x = Flatten()(pool3)
+- 做了13层卷积和相应的池化操作后，使用Flatten()，将数据拉平，变成一维向量
+- x1 = Dense(4096)(x)bnx1 = BatchNormalization()(x1)actx1 = Activation('relu')(bnx1)drop9 = Dropout(0.4)(actx1)
+- 最后做3层全连接层，前两个全连接层的神经元个数为4096，4096只是VGG16论文里提供的参考值，具体可以自己做测试修改。
+- x = [Dense(10, activation='softmax', name='func%d'%(i+1))(x) for i in range(4)]
+
+- VGG16网络里最后的全连接层是1000个神经元，如果你想用VGG16 给自己的数据作分类任务，这里就需要改成你预测的类别数。这个VGG16网络我是用于做4位数字验证码的识别，所以最后的全连接层我修改为创建4个全连接层,区分10类，分别识别4个字符。
